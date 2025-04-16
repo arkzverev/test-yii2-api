@@ -1,0 +1,28 @@
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/code
+      - ./docker/nginx/hosts:/etc/nginx/conf.d
+      - ./docker/nginx/logs:/var/log/nginx
+    depends_on:
+      - php
+    networks:
+      - apptest
+  php:
+    container_name: api-test
+    build:
+      context: docker
+      dockerfile: php/Dockerfile
+    working_dir: /var/www/code
+    volumes:
+      - ./docker/php/php-fpm.d/www.conf:/usr/local/etc/php-fpm.d/www.conf
+      - ./:/var/www/code
+      - ~/.ssh:/root/.ssh
+    networks:
+      - apptest
+networks:
+  apptest:
+    driver: bridge
